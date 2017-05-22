@@ -108,6 +108,11 @@ public:
    * @param meas_package The measurement at k+1
    */
   void UpdateRadar(MeasurementPackage meas_package);
+    
+
+    //VisibleForTesting
+    // x - predicted state,  P - state covariance state
+    MatrixXd generate_sigma_points(VectorXd x, MatrixXd P, double nu_a, double nu_psi);
 };
 
 #endif /* UKF_H */
