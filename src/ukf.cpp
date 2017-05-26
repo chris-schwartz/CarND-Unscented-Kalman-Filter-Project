@@ -1,5 +1,6 @@
 #include "ukf.h"
 #include "tools.h"
+#include "sigma_point_operations.h"
 #include "Eigen/Dense"
 #include <iostream>
 
@@ -96,36 +97,9 @@ void UKF::Prediction(double delta_t) {
   vector, x_. Predict sigma points, the state, and the state covariance matrix.
   */
     
-    //TESTING ONLY
-}
-
-MatrixXd UKF::generate_sigma_points(VectorXd x, MatrixXd P, double nu_acceleration, double nu_yawdd) {
-    auto n = x.size();
-    auto n_aug = n + 2;
-    auto lambda = 3 - n_aug; // TODO, should lambda be calculated from n_aug or n_x
-    
-    auto x_aug = VectorXd(n_aug);
-    x_aug.head(n) = x;
-    x_aug[n+1] = 0;
-    x_aug[n+2] = 0;
-    
-    auto P_aug = MatrixXd(n+2, n+2);
-    P_aug.topLeftCorner(n, n) = P;
-    P_aug(n,n) = nu_acceleration * nu_acceleration;
-    P_aug(n+1, n+1) = nu_yawdd * nu_yawdd;
-    
-    //calculate sigma points
-    auto sigma_points = MatrixXd(n, 2*n+1);
-    MatrixXd L = P_aug.llt().matrixL(); // sqrt matrix
-    
-    //set remaining sigma points
-    for (int i = 0; i < n; i++)
-    {
-        sigma_points.col(i+1)  = x + sqrt(lambda+n) * L.col(i);
-        sigma_points.col(i+1+n) = x - sqrt(lambda+n) * L.col(i);
-    }
-    //
-    return sigma_points;
+    SigmaPointOperations sigma_pt_ops(5);
+    auto sigma_points = sigma_pt_ops.generate_sigma_points(x_, P_, std_a_, std_yawdd_);
+    auto predicted_points = sigma_pt_ops.predict_sigma_points(sigma_points, delta_t);
 }
 
 
