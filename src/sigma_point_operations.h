@@ -7,8 +7,8 @@
 //
 
 
-#ifndef sigma_points_h
-#define sigma_points_h
+#ifndef sigma_point_operations_h
+#define sigma_point_operations_h
 
 #include "Eigen/Dense"
 
