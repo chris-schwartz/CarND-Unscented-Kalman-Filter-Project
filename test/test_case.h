@@ -6,8 +6,7 @@
 //
 //
 
-#ifndef test_case_h
-#define test_case_h
+#pragma once
 
 #include <iostream>
 #include <map>
@@ -28,16 +27,17 @@ public:
     
     typedef void(T::*TestFunctionPointer)();
     typedef std::map<std::string, TestFunctionPointer> TestMap;
-    
 
-    TestCase() {
+
+    TestCase(std::string test_case_name) {
+        test_case_name_ = test_case_name;
         before_all();
     }
     
     ~TestCase() {
         after_all();
     }
-    
+
     virtual void before_all() {
         // do nothing by default
     }
@@ -53,20 +53,22 @@ public:
     virtual void after_each() {
         // do nothing by default
     }
-    
+
+
     void run_tests() {
-        
+        cout << endl << "Running " << test_case_name_ << "..." << endl << endl;
+
         for (typename TestMap::iterator it = test_map_.begin(); it != test_map_.end(); ++it)
         {
-            cout << "Running " << it->first << "..." << endl;
-            
+            cout << "    Running " << it->first << "..." << endl;
+
             const long long start_time =  current_time_milliseconds();
-            
+
             std::string result = run_test(it->second);
-            
+
             const double elapsed = (current_time_milliseconds() - start_time) / 1000.0;
-            
-            std::cout << it->first << " -> " << result << "  (" << elapsed << " s)" << endl << endl;
+
+            std::cout << "    " << it->first << " -> " << result << " (" << elapsed << " s)" << endl << endl;
         }
 
     }
@@ -88,9 +90,9 @@ private:
         }
         catch (exception& e) {
             result = "FAILED";
-            std::cout << endl << "TEST FAILURE: " << e.what() << endl << endl;
+            std::cout << endl << "  TEST FAILURE: " << e.what() << endl << endl;
         }
-        
+
         return result;
     }
     
@@ -100,7 +102,8 @@ private:
     
     TestMap test_map_;
     int passed_tests_;
+
+    std::string test_case_name_;
     
 };
 
-#endif /* test_case_h */

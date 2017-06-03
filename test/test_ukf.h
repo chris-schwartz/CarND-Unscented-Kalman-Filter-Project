@@ -35,28 +35,10 @@ public:
 
 class TestUKF : public TestCase<TestUKF> {
 public:
-    
-    TestUKF() {
-        add_test("testRegisteringMeasurementHandlers", &TestUKF::testRegisteringMeasurementHandlers);
-    }
-    
-    void testRegisteringMeasurementHandlers() {
-        UKF ukf;
-        
-        TestMeasurementHandler* testHandler = new TestMeasurementHandler();
-        ukf.RegisterMeasurementHandler(MeasurementPackage::SensorType::RADAR, testHandler);
-        
-        MeasurementPackage laser_package;
-        MeasurementPackage radar_package;
-        
-        laser_package.sensor_type_ = MeasurementPackage::SensorType::LASER;
-        radar_package.sensor_type_ = MeasurementPackage::SensorType::RADAR;
-        
-        ukf.ProcessMeasurement(laser_package);
-        TestAssertions::assertFalse(testHandler->process_measurement_called_);
-        
-        ukf.ProcessMeasurement(radar_package);
-        TestAssertions::assertTrue(testHandler->process_measurement_called_);
-    }
+
+    TestUKF();
+
+    void testRegisteringMeasurementHandlers();
+
 };
 #endif /* test_ukf_h */
