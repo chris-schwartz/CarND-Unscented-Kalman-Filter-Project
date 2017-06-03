@@ -20,6 +20,10 @@ class MeasurementHandler {
     
 public:
     
+    virtual ~MeasurementHandler() {
+        
+    }
+    
     virtual unique_ptr<VectorXd> CreateInitialStateVector(MeasurementPackage measurement_package) {
         return NULL;
     }
@@ -27,6 +31,8 @@ public:
     virtual void ProcessMeasurement(MeasurementPackage measurement_package) {
         return;
     }
+    
+    
     
 };
 

@@ -59,10 +59,17 @@ UKF::UKF() {
     
 }
 
-UKF::~UKF() {}
+UKF::~UKF() {
+    for (MeasurementHandlerMap::iterator it = measurement_handlers_.begin(); it != measurement_handlers_.end(); ++it)
+    {
+        if(it->second != NULL) {
+            delete it->second;
+        }
+    }
+}
 
-void RegisterMeasurementHandler(MeasurementPackage::SensorType sensor_type, MeasurementHandler handler) {
-    
+void UKF::RegisterMeasurementHandler(MeasurementPackage::SensorType sensor_type, MeasurementHandler* handler) {
+    measurement_handlers_[sensor_type] = handler;
 }
 
 void UKF::Init(MeasurementPackage meas_package) {
@@ -76,8 +83,8 @@ void UKF::Init(MeasurementPackage meas_package) {
     0,  0,  0, 1000, 0,
     0,  0,  0, 0, 1000;
     
-    MeasurementHandler handler = LookupMeasurementHandler(meas_package.sensor_type_);
-    unique_ptr<VectorXd> initial_state_vector = handler.CreateInitialStateVector(meas_package);
+    MeasurementHandler* handler = LookupMeasurementHandler(meas_package.sensor_type_);
+    unique_ptr<VectorXd> initial_state_vector = handler->CreateInitialStateVector(meas_package);
     
     if(initial_state_vector.get() != NULL) {
         x_ = *initial_state_vector.get();
@@ -105,9 +112,10 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
     
     double delta_t_seconds = ComputeElapsedTimeInSeconds(meas_package);
     
-    MeasurementHandler handler = LookupMeasurementHandler(meas_package.sensor_type_);
-    handler.ProcessMeasurement(meas_package);
-    
+    MeasurementHandler* handler = LookupMeasurementHandler(meas_package.sensor_type_);
+    if(handler != NULL) {
+        handler->ProcessMeasurement(meas_package);
+    }
 }
 
 /**
@@ -166,12 +174,12 @@ double UKF::ComputeElapsedTimeInSeconds(MeasurementPackage measurement_pack) {
     return delta_t_seconds;
 }
 
-MeasurementHandler UKF::LookupMeasurementHandler(MeasurementPackage::SensorType key) {
-    std::map<MeasurementPackage::SensorType, MeasurementHandler>::iterator it  = measurement_handlers_.find(key);
+MeasurementHandler* UKF::LookupMeasurementHandler(MeasurementPackage::SensorType key) {
+    std::map<MeasurementPackage::SensorType, MeasurementHandler*>::iterator it  = measurement_handlers_.find(key);
     
     if(it == measurement_handlers_.end()) {
         cout << "Measurements provided are for an unregistered sensor type" << endl;
-        return MeasurementHandler();
+        return NULL;
     }
     
     return it->second;

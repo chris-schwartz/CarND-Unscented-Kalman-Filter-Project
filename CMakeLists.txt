@@ -10,6 +10,10 @@ set(sources
    src/sigma_point_operations.cpp
    src/tools.cpp)
 
+set(test_sources
+    test/all_tests.cpp
+    test/)
+
 include_directories(src)
 add_library(UnscentedKFLib ${sources})
 

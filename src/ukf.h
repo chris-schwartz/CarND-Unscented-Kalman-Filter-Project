@@ -18,6 +18,7 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 class UKF {
+    typedef std::map<MeasurementPackage::SensorType, MeasurementHandler*> MeasurementHandlerMap;
 public:
     
     ///* initially set to false, set to true in first call of ProcessMeasurement
@@ -38,7 +39,8 @@ public:
     ///* predicted sigma points matrix
     MatrixXd Xsig_pred_;
     
-    std::map<MeasurementPackage::SensorType, MeasurementHandler> measurement_handlers_;
+    ///* Maintains a map of objects to process measurements from different sensor types
+    MeasurementHandlerMap measurement_handlers_;
     
     ///* time when the state is true, in us
     long long time_us_;
@@ -125,11 +127,17 @@ public:
     void Init(MeasurementPackage meas_package);
     
     
+    /**
+     * RegisterMeasurementHandler
+     */
+    void RegisterMeasurementHandler(MeasurementPackage::SensorType sensor_type, MeasurementHandler* handler);
+    
+    
 private:
     
     double ComputeElapsedTimeInSeconds(MeasurementPackage meas_package);
     
-    MeasurementHandler LookupMeasurementHandler(MeasurementPackage::SensorType key);
+    MeasurementHandler* LookupMeasurementHandler(MeasurementPackage::SensorType key);
     
     
 };
