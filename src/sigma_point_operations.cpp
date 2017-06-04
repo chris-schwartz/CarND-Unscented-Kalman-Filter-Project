@@ -6,10 +6,6 @@
 //
 //
 #include "sigma_point_operations.h"
-#include <stdio.h>
-
-
-#include "Eigen/Dense"
 
 using namespace Eigen;
 
@@ -107,8 +103,8 @@ MatrixXd SigmaPointOperations::generate_sigma_points(VectorXd x, MatrixXd P, dou
 
 VectorXd SigmaPointOperations::predict_mean(const MatrixXd& sigma_points) {
     int sigma_point_count = sigma_points.cols();
-    
-    VectorXd x = VectorXd(row_count_);
+
+    VectorXd x(row_count_);
     x.fill(0.0);
     
     VectorXd weights = calculate_weights(sigma_point_count);
@@ -142,10 +138,10 @@ MatrixXd SigmaPointOperations::predict_covariance(const MatrixXd& sigma_points, 
 
 
 VectorXd SigmaPointOperations::calculate_weights(int sigma_point_count) {
-    
-    VectorXd weights = VectorXd(sigma_point_count);
-    
-    weights(0) = lambda_/(lambda_+augmented_row_count_);
+
+    VectorXd weights(sigma_point_count);
+
+    weights(0) = (lambda_ * 1.0) / (lambda_ + augmented_row_count_);
     for (int i=1; i<sigma_point_count; i++) {
         weights(i) = 0.5/(augmented_row_count_+lambda_);
     }

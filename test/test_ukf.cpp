@@ -21,7 +21,14 @@ void TestUKF::testRegisteringMeasurementHandlers() {
 
     ukf.ProcessMeasurement(laser_package);
     TestAssertions::assertFalse(testHandler->process_measurement_called_);
+    TestAssertions::assertFalse(testHandler->create_initial_state_vector_called_);
 
+    // Initializes creating initial state vector the first its called
+    ukf.ProcessMeasurement(radar_package);
+    TestAssertions::assertFalse(testHandler->process_measurement_called_);
+    TestAssertions::assertTrue(testHandler->create_initial_state_vector_called_);
+
+    // Processes new measurement the second time
     ukf.ProcessMeasurement(radar_package);
     TestAssertions::assertTrue(testHandler->process_measurement_called_);
 }

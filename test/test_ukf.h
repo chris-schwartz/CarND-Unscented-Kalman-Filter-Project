@@ -20,15 +20,19 @@ class TestMeasurementHandler : public MeasurementHandler {
 public:
     bool create_initial_state_vector_called_ = false;
     bool process_measurement_called_ = false;
-    
-    unique_ptr<VectorXd> CreateInitialStateVector(MeasurementPackage measurement_package) {
+
+    TestMeasurementHandler() : MeasurementHandler(1) {
+
+    }
+
+    unique_ptr<VectorXd> CreateInitialStateVector(const MeasurementPackage &measurement_package) {
         create_initial_state_vector_called_ = true;
         return unique_ptr<VectorXd>(new VectorXd(5));
     }
-    
-    void ProcessMeasurement(MeasurementPackage measurement_package) {
+
+    MeasurementPrediction PredictMeasurement(const MatrixXd &Xsig_pred, const VectorXd &weights) {
         process_measurement_called_ = true;
-        return;
+        return MeasurementPrediction(VectorXd(1), MatrixXd(1, 1));
     }
     
 };

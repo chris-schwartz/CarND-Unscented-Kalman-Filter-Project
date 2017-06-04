@@ -11,7 +11,7 @@
 
 #include "test_case.h"
 #include "sigma_point_operations.h"
-#include "eigen_asserts.h"
+#include "eigen_assert.h"
 
 class TestSigmaPointOperations : public TestCase<TestSigmaPointOperations> {
     

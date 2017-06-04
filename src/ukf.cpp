@@ -1,8 +1,5 @@
 #include "ukf.h"
-#include "tools.h"
 #include "sigma_point_operations.h"
-#include "measurement_handler.h"
-#include "Eigen/Dense"
 #include <iostream>
 
 using namespace std;
@@ -16,37 +13,37 @@ using std::vector;
 UKF::UKF() {
     // if this is false, laser measurements will be ignored (except during init)
     use_laser_ = true;
-    
+
     // if this is false, radar measurements will be ignored (except during init)
     use_radar_ = true;
-    
+
     // initial state vector
     x_ = VectorXd(5);
-    
+
     // initial covariance matrix
     P_ = MatrixXd(5, 5);
-    
+
     // Process noise standard deviation longitudinal acceleration in m/s^2
     std_a_ = 30;
-    
+
     // Process noise standard deviation yaw acceleration in rad/s^2
     std_yawdd_ = 30;
-    
+
     // Laser measurement noise standard deviation position1 in m
     std_laspx_ = 0.15;
-    
+
     // Laser measurement noise standard deviation position2 in m
     std_laspy_ = 0.15;
-    
+
     // Radar measurement noise standard deviation radius in m
     std_radr_ = 0.3;
-    
+
     // Radar measurement noise standard deviation angle in rad
     std_radphi_ = 0.03;
-    
+
     // Radar measurement noise standard deviation radius change in m/s
     std_radrd_ = 0.3;
-    
+
     /**
      TODO:
      
@@ -54,39 +51,44 @@ UKF::UKF() {
      
      Hint: one or more values initialized above might be wildly off...
      */
-    
+
+    weights_ = VectorXd::Zero(2 * n_aug_ + 1);
+
     previous_timestamp_ = 0;
-    
+
 }
 
 UKF::~UKF() {
-    for (MeasurementHandlerMap::iterator it = measurement_handlers_.begin(); it != measurement_handlers_.end(); ++it)
-    {
-        if(it->second != NULL) {
+    for (MeasurementHandlerMap::iterator it = measurement_handlers_.begin(); it != measurement_handlers_.end(); ++it) {
+        if (it->second != NULL) {
             delete it->second;
         }
     }
 }
 
-void UKF::RegisterMeasurementHandler(MeasurementPackage::SensorType sensor_type, MeasurementHandler* handler) {
+void UKF::RegisterMeasurementHandler(MeasurementPackage::SensorType sensor_type, MeasurementHandler *handler) {
     measurement_handlers_[sensor_type] = handler;
 }
 
 void UKF::Init(MeasurementPackage meas_package) {
     //TODO - Complete, init P, x_
-    
-    P_ = MatrixXd(5,5);
+
+    P_ = MatrixXd(5, 5);
     P_ <<
-    1000,  0,  0, 0, 0,
-    0,  1000,  0, 0, 0,
-    0,  0,  1000, 0, 0,
-    0,  0,  0, 1000, 0,
-    0,  0,  0, 0, 1000;
-    
-    MeasurementHandler* handler = LookupMeasurementHandler(meas_package.sensor_type_);
+       1000, 0, 0, 0, 0,
+        0, 1000, 0, 0, 0,
+        0, 0, 1000, 0, 0,
+        0, 0, 0, 1000, 0,
+        0, 0, 0, 0, 1000;
+
+    MeasurementHandler *handler = LookupMeasurementHandler(meas_package.sensor_type_);
+    if (handler == NULL) {
+        return;
+    }
+
     unique_ptr<VectorXd> initial_state_vector = handler->CreateInitialStateVector(meas_package);
-    
-    if(initial_state_vector.get() != NULL) {
+
+    if (initial_state_vector.get() != NULL) {
         x_ = *initial_state_vector.get();
         previous_timestamp_ = meas_package.timestamp_;
         is_initialized_ = true;
@@ -104,17 +106,17 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
      Complete this function! Make sure you switch between lidar and radar
      measurements.
      */
-    
-    if(!is_initialized_) {
+
+    if (!is_initialized_) {
         Init(meas_package);
         return;
     }
-    
+
     double delta_t_seconds = ComputeElapsedTimeInSeconds(meas_package);
-    
-    MeasurementHandler* handler = LookupMeasurementHandler(meas_package.sensor_type_);
-    if(handler != NULL) {
-        handler->ProcessMeasurement(meas_package);
+
+    MeasurementHandler *handler = LookupMeasurementHandler(meas_package.sensor_type_);
+    if (handler != NULL) {
+        handler->PredictMeasurement(Xsig_pred_, weights_);
     }
 }
 
@@ -130,12 +132,11 @@ void UKF::Prediction(double delta_t) {
      Complete this function! Estimate the object's location. Modify the state
      vector, x_. Predict sigma points, the state, and the state covariance matrix.
      */
-    
+
     SigmaPointOperations sigma_pt_ops(5);
     auto sigma_points = sigma_pt_ops.generate_sigma_points(x_, P_, std_a_, std_yawdd_);
     Xsig_pred_ = sigma_pt_ops.predict_sigma_points(sigma_points, delta_t);
 }
-
 
 /**
  * Updates the state and the state covariance matrix using a laser measurement.
@@ -174,13 +175,13 @@ double UKF::ComputeElapsedTimeInSeconds(MeasurementPackage measurement_pack) {
     return delta_t_seconds;
 }
 
-MeasurementHandler* UKF::LookupMeasurementHandler(MeasurementPackage::SensorType key) {
-    std::map<MeasurementPackage::SensorType, MeasurementHandler*>::iterator it  = measurement_handlers_.find(key);
-    
-    if(it == measurement_handlers_.end()) {
+MeasurementHandler *UKF::LookupMeasurementHandler(MeasurementPackage::SensorType key) {
+    std::map<MeasurementPackage::SensorType, MeasurementHandler *>::iterator it = measurement_handlers_.find(key);
+
+    if (it == measurement_handlers_.end()) {
         cout << "Measurements provided are for an unregistered sensor type" << endl;
         return NULL;
     }
-    
+
     return it->second;
 }

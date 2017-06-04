@@ -16,12 +16,14 @@
 
 #include <unistd.h>
 
+#include "runnable.h"
 #include "test_assertions.h"
+
 
 using namespace std;
 
 template <typename T>  // T should always be a type that extends TestCase
-class TestCase {
+class TestCase : public Runnable {
     
 public:
     
@@ -71,6 +73,10 @@ public:
             std::cout << "    " << it->first << " -> " << result << " (" << elapsed << " s)" << endl << endl;
         }
 
+    }
+
+    void run() {
+        run_tests();
     }
     
 protected:

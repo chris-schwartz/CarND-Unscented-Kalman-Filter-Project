@@ -8,13 +8,15 @@ set(sources
     src/ukf.cpp
     src/main.cpp
     src/sigma_point_operations.cpp
-    src/tools.cpp)
+    src/tools.cpp
+    src/radar_measurement_handler.cpp
+    src/measurement_handler.cpp)
 
 set(test_sources
     test/all_tests.cpp
     test/test_sigma_point_operations.cpp
     test/test_ukf.cpp
-    )
+    test/test_radar_measurement_handler.cpp test/runnable.h)
 
 include_directories(src)
 add_library(UnscentedKFLib ${sources})

@@ -18,9 +18,9 @@ class EigenAssert {
 public:
     
 static void assertMatricesEqual(const MatrixXd& actual, const MatrixXd& expected, double tolerance = 0.0001) {
-    for(int r = 0; r < expected.rows(); r++) {
-        for(int c = 0; c < expected.cols(); c++) {
-            auto diff = expected(r,c) - actual(r,c);
+    for (long r = 0; r < expected.rows(); r++) {
+        for (long c = 0; c < expected.cols(); c++) {
+            auto diff = abs(expected(r, c) - actual(r, c));
             if(diff >= tolerance) {
                 std::ostringstream os;
                 os << "Difference of " << diff << " found at row: " << r << " column: " << c;
