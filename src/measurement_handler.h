@@ -31,15 +31,13 @@ class MeasurementHandler {
     
 public:
 
-    MeasurementHandler(int measurement_dimension_count);
+    MeasurementHandler(int measurement_dimension_count, const VectorXd &noise_stdd);
 
     virtual ~MeasurementHandler();
 
     virtual unique_ptr<VectorXd> CreateInitialStateVector(const MeasurementPackage &measurement_package) = 0;
 
     virtual MeasurementPrediction PredictMeasurement(const MatrixXd &Xsig_pred, const VectorXd &weights) = 0;
-
-    void SetNoiseStandardDeviation(const VectorXd &noise_std_deviation);
 
     MatrixXd ComputeNoiseCovarianceMatrix();
 
@@ -53,7 +51,8 @@ public:
 
     long measurement_dimension_count_;
 
-    VectorXd noise_std_deviation_;
+    const VectorXd noise_std_deviation_;
+
 };
 
 #endif /* measurement_handler_h */

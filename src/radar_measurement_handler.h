@@ -12,12 +12,19 @@
 class RadarMeasurementHandler : public MeasurementHandler {
 
  public:
-    RadarMeasurementHandler();
     ~RadarMeasurementHandler() override;
+
+    static RadarMeasurementHandler init(double noise_stdd_radius_meters,
+                                        double noise_stdd_angle_radians,
+                                        double noise_stdd_radius_meters_per_sec);
 
     unique_ptr<VectorXd> CreateInitialStateVector(const MeasurementPackage &measurement_package) override;
 
-    MeasurementPrediction PredictMeasurement(const MatrixXd &Xsig_pred, const VectorXd &weights) override;
+    MeasurementPrediction PredictMeasurement(const MatrixXd &Xsig_pred,
+                                             const VectorXd &weights) override;
+
+ private:
+    RadarMeasurementHandler(const VectorXd &noise_stdd);
 
 };
 

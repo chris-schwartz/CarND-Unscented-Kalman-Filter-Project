@@ -14,7 +14,7 @@ TestRadarMeasurementHandler::TestRadarMeasurementHandler() : TestCase("TestRadar
 
 void TestRadarMeasurementHandler::testCreatingInitialStateVector() {
 
-    RadarMeasurementHandler radar_measurement_handler;
+    RadarMeasurementHandler radar_measurement_handler = RadarMeasurementHandler::init(0.3, 0.0175, 0.1);
 
     MeasurementPackage measurement_package = GetMeasurementPackageForReadings(1.0, .55, 4.9);
 
@@ -27,12 +27,8 @@ void TestRadarMeasurementHandler::testCreatingInitialStateVector() {
 }
 
 void TestRadarMeasurementHandler::testComputingNoiseCovarianceMatrix() {
-    RadarMeasurementHandler radar_measurement_handler;
+    RadarMeasurementHandler radar_measurement_handler = RadarMeasurementHandler::init(2, 3, 4);
 
-    VectorXd noise_std_dev(3);
-    noise_std_dev << 2, 3, 4;
-
-    radar_measurement_handler.SetNoiseStandardDeviation(noise_std_dev);
     MatrixXd result = radar_measurement_handler.ComputeNoiseCovarianceMatrix();
 
     MatrixXd expected(3, 3);
@@ -44,11 +40,7 @@ void TestRadarMeasurementHandler::testComputingNoiseCovarianceMatrix() {
 }
 
 void TestRadarMeasurementHandler::testPredictingMeasurements() {
-    RadarMeasurementHandler radar_measurement_handler;
-
-    VectorXd noise_std_dev(3);
-    noise_std_dev << 0.3, 0.0175, 0.1;
-    radar_measurement_handler.SetNoiseStandardDeviation(noise_std_dev);
+    RadarMeasurementHandler radar_measurement_handler = RadarMeasurementHandler::init(0.3, 0.0175, 0.1);
 
     //set vector for weights
     int n_aug = 7;

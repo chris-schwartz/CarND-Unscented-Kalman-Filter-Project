@@ -7,6 +7,8 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using std::vector;
 
+//TODO when creating handlers, need to make sure to add noise constants
+
 /**
  * Initializes Unscented Kalman filter
  */
@@ -112,12 +114,17 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
         return;
     }
 
+    // predict sigma points
     double delta_t_seconds = ComputeElapsedTimeInSeconds(meas_package);
+    Prediction(delta_t_seconds);
 
     MeasurementHandler *handler = LookupMeasurementHandler(meas_package.sensor_type_);
-    if (handler != NULL) {
-        handler->PredictMeasurement(Xsig_pred_, weights_);
+    if (handler == NULL) {
+        return;
     }
+
+    MeasurementPrediction prediciton = handler->PredictMeasurement(Xsig_pred_, weights_);
+
 }
 
 /**

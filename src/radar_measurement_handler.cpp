@@ -4,12 +4,23 @@
 
 #include "radar_measurement_handler.h"
 
-RadarMeasurementHandler::RadarMeasurementHandler() : MeasurementHandler(3) {
+RadarMeasurementHandler::RadarMeasurementHandler(const VectorXd &noise_stdd) : MeasurementHandler(3, noise_stdd) {
 
 }
 
 RadarMeasurementHandler::~RadarMeasurementHandler() {
 
+}
+
+RadarMeasurementHandler RadarMeasurementHandler::init(double noise_stdd_radius_meters,
+                                                      double noise_stdd_angle_radians,
+                                                      double noise_stdd_radius_meters_per_sec) {
+    VectorXd noise_stdd(3);
+    noise_stdd << noise_stdd_radius_meters,
+        noise_stdd_angle_radians,
+        noise_stdd_radius_meters_per_sec;
+
+    return RadarMeasurementHandler(noise_stdd);
 }
 
 unique_ptr<VectorXd> RadarMeasurementHandler::CreateInitialStateVector(const MeasurementPackage &measurement_package) {
@@ -30,11 +41,14 @@ unique_ptr<VectorXd> RadarMeasurementHandler::CreateInitialStateVector(const Mea
     return x_;
 }
 
-MeasurementPrediction RadarMeasurementHandler::PredictMeasurement(const MatrixXd &Xsig_pred, const VectorXd &weights) {
+MeasurementPrediction RadarMeasurementHandler::PredictMeasurement(const MatrixXd &Xsig_pred,
+                                                                  const VectorXd &weights) {
     MatrixXd Zsig = BuildMeasurementSpaceMatrix(Xsig_pred.cols());
 
     long sigma_point_count = Zsig.cols();
 
+    // TODO, should be able to pull most of the method up into superclass, and write specific implementaion for
+    // TODO transofrming simga points into measurement space for each handler.
     //transform sigma points into measurement space
     for (int i = 0; i < sigma_point_count; i++) {
 

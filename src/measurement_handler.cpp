@@ -4,8 +4,8 @@
 
 #include "measurement_handler.h"
 
-MeasurementHandler::MeasurementHandler(int measurement_dimension_count) : measurement_dimension_count_(
-    measurement_dimension_count), noise_std_deviation_(VectorXd::Zero(measurement_dimension_count)) {
+MeasurementHandler::MeasurementHandler(int measurement_dimension_count, const VectorXd &noise_stdd) :
+    measurement_dimension_count_(measurement_dimension_count), noise_std_deviation_(noise_stdd) {
 
 }
 
@@ -18,12 +18,9 @@ MatrixXd MeasurementHandler::BuildMeasurementSpaceMatrix(long column_count) {
     measurement_space_matrix.setZero();
     return measurement_space_matrix;
 }
+
 long MeasurementHandler::GetDimensionCount() {
     return measurement_dimension_count_;
-}
-
-void MeasurementHandler::SetNoiseStandardDeviation(const VectorXd &noise_std_deviation) {
-    noise_std_deviation_ = noise_std_deviation;
 }
 
 MatrixXd MeasurementHandler::ComputeNoiseCovarianceMatrix() {

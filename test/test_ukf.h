@@ -21,7 +21,7 @@ public:
     bool create_initial_state_vector_called_ = false;
     bool process_measurement_called_ = false;
 
-    TestMeasurementHandler() : MeasurementHandler(1) {
+    TestMeasurementHandler() : MeasurementHandler(1, VectorXd(1)) {
 
     }
 
