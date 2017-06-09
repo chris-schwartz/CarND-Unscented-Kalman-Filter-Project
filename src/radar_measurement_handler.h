@@ -20,11 +20,11 @@ class RadarMeasurementHandler : public MeasurementHandler {
 
     unique_ptr<VectorXd> CreateInitialStateVector(const MeasurementPackage &measurement_package) override;
 
-    MeasurementPrediction PredictMeasurement(const MatrixXd &Xsig_pred,
-                                             const VectorXd &weights) override;
+    VectorXd ExtractMeasurements(const VectorXd &Xsig_pred) override;
 
  private:
-    RadarMeasurementHandler(const VectorXd &noise_stdd);
+    MatrixXd ComputeSigmaPointsInMeasurementSpace(const MatrixXd &raw_measurements) override;
 
+    RadarMeasurementHandler(const VectorXd &noise_stdd);
 };
 

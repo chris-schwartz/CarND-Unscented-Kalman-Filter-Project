@@ -19,6 +19,8 @@ class TestRadarMeasurementHandler : public TestCase<TestRadarMeasurementHandler>
 
     void testPredictingMeasurements();
 
+    void testExtractingMeasurements();
+
  private:
 
     MeasurementPackage GetMeasurementPackageForReadings(double rho, double phi, double rhodot) const;

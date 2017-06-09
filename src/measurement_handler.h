@@ -37,7 +37,18 @@ public:
 
     virtual unique_ptr<VectorXd> CreateInitialStateVector(const MeasurementPackage &measurement_package) = 0;
 
-    virtual MeasurementPrediction PredictMeasurement(const MatrixXd &Xsig_pred, const VectorXd &weights) = 0;
+    virtual MatrixXd ComputeSigmaPointsInMeasurementSpace(const MatrixXd &Xsig_pred) = 0;
+
+    virtual VectorXd ExtractMeasurements(const VectorXd &Xsig_pred) = 0;
+
+    MeasurementPrediction PredictMeasurement(const MatrixXd &Xsig_pred, const VectorXd &weights);
+
+    void Update(const MeasurementPrediction &measurement_prediction,
+                const VectorXd &measurements,
+                const MatrixXd &Xsig_pred,
+                const VectorXd &weights,
+                VectorXd &x_out,
+                MatrixXd &P_out);
 
     MatrixXd ComputeNoiseCovarianceMatrix();
 

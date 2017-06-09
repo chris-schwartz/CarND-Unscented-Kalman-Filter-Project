@@ -21,6 +21,8 @@ class TestLidarMeasurementHandler : public TestCase<TestLidarMeasurementHandler>
 
     void testPredictingMeasurements();
 
+    void testExtractingMeasurements();
+
     VectorXd GetWeights() const;
 };
 

@@ -10,7 +10,7 @@ TestUKF::TestUKF() : TestCase("TestUKF") {
 void TestUKF::testRegisteringMeasurementHandlers() {
     UKF ukf;
 
-    TestMeasurementHandler *testHandler = new TestMeasurementHandler();
+    MockMeasurementHandler *testHandler = new MockMeasurementHandler();
     ukf.RegisterMeasurementHandler(MeasurementPackage::SensorType::RADAR, testHandler);
 
     MeasurementPackage laser_package;
@@ -20,16 +20,16 @@ void TestUKF::testRegisteringMeasurementHandlers() {
     radar_package.sensor_type_ = MeasurementPackage::SensorType::RADAR;
 
     ukf.ProcessMeasurement(laser_package);
-    TestAssertions::assertFalse(testHandler->process_measurement_called_);
+    TestAssertions::assertFalse(testHandler->computes_sigma_points_);
     TestAssertions::assertFalse(testHandler->create_initial_state_vector_called_);
 
     // Initializes creating initial state vector the first its called
     ukf.ProcessMeasurement(radar_package);
-    TestAssertions::assertFalse(testHandler->process_measurement_called_);
+    TestAssertions::assertFalse(testHandler->computes_sigma_points_);
     TestAssertions::assertTrue(testHandler->create_initial_state_vector_called_);
 
     // Processes new measurement the second time
     ukf.ProcessMeasurement(radar_package);
-    TestAssertions::assertTrue(testHandler->process_measurement_called_);
+    TestAssertions::assertTrue(testHandler->computes_sigma_points_);
 }
 

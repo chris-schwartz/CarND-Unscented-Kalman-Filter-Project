@@ -12,6 +12,7 @@ TestLidarMeasurementHandler::TestLidarMeasurementHandler() : TestCase("TestLidar
     add_test("testCreatingInitialStateVector", &TestLidarMeasurementHandler::testCreatingInitialStateVector);
     add_test("testComputingNoiseCovarianceMatrix", &TestLidarMeasurementHandler::testComputingNoiseCovarianceMatrix);
     add_test("testPredictingMeasurements", &TestLidarMeasurementHandler::testPredictingMeasurements);
+    add_test("testExtractingMeasurements", &TestLidarMeasurementHandler::testExtractingMeasurements);
 }
 
 void TestLidarMeasurementHandler::testCreatingInitialStateVector() {
@@ -86,4 +87,18 @@ VectorXd TestLidarMeasurementHandler::GetWeights() const {
         weights(i) = weight;
     }
     return weights;
+}
+
+void TestLidarMeasurementHandler::testExtractingMeasurements() {
+    VectorXd raw_measurements(5);
+    raw_measurements << 1, 2, 333, 4444, 55555;
+
+    LidarMeasurementHandler handler = LidarMeasurementHandler::init(0, 0);
+    VectorXd result = handler.ExtractMeasurements(raw_measurements);
+
+    VectorXd expected(2);
+    expected << 1, 2;
+
+    EigenAssert::assertMatricesEqual(result, expected);
+
 }

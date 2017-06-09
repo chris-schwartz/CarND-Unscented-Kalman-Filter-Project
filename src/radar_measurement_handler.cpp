@@ -41,14 +41,10 @@ unique_ptr<VectorXd> RadarMeasurementHandler::CreateInitialStateVector(const Mea
     return x_;
 }
 
-MeasurementPrediction RadarMeasurementHandler::PredictMeasurement(const MatrixXd &Xsig_pred,
-                                                                  const VectorXd &weights) {
-    MatrixXd Zsig = BuildMeasurementSpaceMatrix(Xsig_pred.cols());
+MatrixXd RadarMeasurementHandler::ComputeSigmaPointsInMeasurementSpace(const MatrixXd &Xsig_pred) {
+    long sigma_point_count = Xsig_pred.cols();
+    MatrixXd Zsig = BuildMeasurementSpaceMatrix(sigma_point_count);
 
-    long sigma_point_count = Zsig.cols();
-
-    // TODO, should be able to pull most of the method up into superclass, and write specific implementaion for
-    // TODO transofrming simga points into measurement space for each handler.
     //transform sigma points into measurement space
     for (int i = 0; i < sigma_point_count; i++) {
 
@@ -67,32 +63,11 @@ MeasurementPrediction RadarMeasurementHandler::PredictMeasurement(const MatrixXd
         Zsig(2, i) = (p_x * v1 + p_y * v2) / sqrt(p_x * p_x + p_y * p_y);   //r_dot
     }
 
-    long n_z = GetDimensionCount();
+    return Zsig;
+}
 
-    //mean predicted measurement
-    VectorXd z_pred(n_z);
-    z_pred.fill(0.0);
-    for (int i = 0; i < sigma_point_count; i++) {
-        z_pred = z_pred + weights(i) * Zsig.col(i);
-    }
-
-    //measurement covariance matrix S
-    MatrixXd S(n_z, n_z);
-    S.fill(0.0);
-    for (int i = 0; i < sigma_point_count; i++) {  //2n+1 simga points
-        //residual
-        VectorXd z_diff = Zsig.col(i) - z_pred;
-
-        //angle normalization
-        while (z_diff(1) > M_PI) z_diff(1) -= 2. * M_PI;
-        while (z_diff(1) < -M_PI) z_diff(1) += 2. * M_PI;
-
-        S = S + weights(i) * z_diff * z_diff.transpose();
-    }
-
-    //add measurement noise covariance matrix
-    S = S + ComputeNoiseCovarianceMatrix();
-
-    MeasurementPrediction prediction(z_pred, S);
-    return prediction;
+VectorXd RadarMeasurementHandler::ExtractMeasurements(const VectorXd &raw_measurements) {
+    VectorXd z(3);
+    z << raw_measurements(0), raw_measurements(1), raw_measurements(2);
+    return z;
 }

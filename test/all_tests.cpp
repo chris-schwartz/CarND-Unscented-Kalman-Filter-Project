@@ -5,6 +5,7 @@
 #include "test_ukf.h"
 #include "test_radar_measurement_handler.h"
 #include "test_lidar_measurement_handler.h"
+#include "test_measurement_handler.h"
 
 void add_test_case(Runnable *test, vector<unique_ptr<Runnable>> &test_cases_out) {
     test_cases_out.push_back(unique_ptr<Runnable>(test));
@@ -22,6 +23,8 @@ int main(int argc, char* argv[]) {
 
     add_test_case(new TestRadarMeasurementHandler(), test_cases);
     add_test_case(new TestLidarMeasurementHandler(), test_cases);
+
+    add_test_case(new TestMeasurementHandler(), test_cases);
 
     auto start_time = current_time_milliseconds();
 

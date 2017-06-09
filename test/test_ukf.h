@@ -14,14 +14,13 @@
 #include "ukf.h"
 #include "test_case.h"
 
-
-class TestMeasurementHandler : public MeasurementHandler {
+class MockMeasurementHandler : public MeasurementHandler {
 
 public:
     bool create_initial_state_vector_called_ = false;
-    bool process_measurement_called_ = false;
+    bool computes_sigma_points_ = false;
 
-    TestMeasurementHandler() : MeasurementHandler(1, VectorXd(1)) {
+    MockMeasurementHandler() : MeasurementHandler(3, VectorXd::Zero(3)) {
 
     }
 
@@ -30,11 +29,16 @@ public:
         return unique_ptr<VectorXd>(new VectorXd(5));
     }
 
-    MeasurementPrediction PredictMeasurement(const MatrixXd &Xsig_pred, const VectorXd &weights) {
-        process_measurement_called_ = true;
-        return MeasurementPrediction(VectorXd(1), MatrixXd(1, 1));
+    MatrixXd ComputeSigmaPointsInMeasurementSpace(const MatrixXd &Xsig_pred) {
+        computes_sigma_points_ = true;
+        auto Zsig = BuildMeasurementSpaceMatrix(Xsig_pred.cols());
+        return MatrixXd::Zero(Zsig.rows(), Zsig.cols());
     }
-    
+
+    VectorXd ExtractMeasurements(const VectorXd &raw_measurements) {
+        return VectorXd::Zero(3);
+    }
+
 };
 
 class TestUKF : public TestCase<TestUKF> {

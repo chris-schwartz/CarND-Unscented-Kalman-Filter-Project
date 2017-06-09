@@ -14,9 +14,11 @@ class LidarMeasurementHandler : public MeasurementHandler {
 
     ~LidarMeasurementHandler();
 
-    unique_ptr<VectorXd> CreateInitialStateVector(const MeasurementPackage &measurement_package);
+    unique_ptr<VectorXd> CreateInitialStateVector(const MeasurementPackage &measurement_package) override;
 
-    MeasurementPrediction PredictMeasurement(const MatrixXd &Xsig_pred, const VectorXd &weights);
+    MatrixXd ComputeSigmaPointsInMeasurementSpace(const MatrixXd &Xsig_pred) override;
+
+    VectorXd ExtractMeasurements(const VectorXd &Xsig_pred) override;
 
  private:
 

@@ -18,7 +18,8 @@ set(test_sources
     test/test_sigma_point_operations.cpp
     test/test_ukf.cpp
     test/test_radar_measurement_handler.cpp
-    test/test_lidar_measurement_handler.cpp)
+    test/test_lidar_measurement_handler.cpp
+    test/test_measurement_handler.cpp)
 
 include_directories(src)
 add_library(UnscentedKFLib ${sources})

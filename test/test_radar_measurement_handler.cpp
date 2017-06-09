@@ -10,6 +10,7 @@ TestRadarMeasurementHandler::TestRadarMeasurementHandler() : TestCase("TestRadar
     add_test("testCreatingInitialStateVector", &TestRadarMeasurementHandler::testCreatingInitialStateVector);
     add_test("testComputingNoiseCovarianceMatrix", &TestRadarMeasurementHandler::testComputingNoiseCovarianceMatrix);
     add_test("testPredictingMeasurements", &TestRadarMeasurementHandler::testPredictingMeasurements);
+    add_test("testExtractingMeasurements", &TestRadarMeasurementHandler::testExtractingMeasurements);
 }
 
 void TestRadarMeasurementHandler::testCreatingInitialStateVector() {
@@ -88,6 +89,19 @@ MeasurementPackage TestRadarMeasurementHandler::GetMeasurementPackageForReadings
 
     measurement_package.raw_measurements_ = radar_measurements;
     return measurement_package;
+}
+
+void TestRadarMeasurementHandler::testExtractingMeasurements() {
+    VectorXd raw_measurements(5);
+    raw_measurements << 1, 2, 3, 4444, 55555;
+
+    RadarMeasurementHandler handler = RadarMeasurementHandler::init(0, 0, 0);
+    VectorXd result = handler.ExtractMeasurements(raw_measurements);
+
+    VectorXd expected(3);
+    expected << 1, 2, 3;
+
+    EigenAssert::assertMatricesEqual(result, expected);
 }
 
 
